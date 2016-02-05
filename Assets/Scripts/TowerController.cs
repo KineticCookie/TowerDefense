@@ -1,15 +1,66 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class TowerController : MonoBehaviour {
+public class TowerController : MonoBehaviour
+{
+    #region Fields
+    /// <summary>
+    /// Bullets for turret
+    /// </summary>
+    public GameObject bulletPrefab;
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    /// <summary>
+    /// Pause between shots. Measured in seconds
+    /// </summary>
+    public float shotsPause = 1;
+
+    /// <summary>
+    /// Queue of spotted targets. Tower will fire to the first enemy in queue.
+    /// </summary>
+    private List<GameObject> targets = new List<GameObject>();
+    #endregion
+
+    #region Behaviour
+    void Start()
+    {
+        InvokeRepeating("SearchAndDestroy", shotsPause, shotsPause);
+    }
+    #endregion
+
+    #region Methods
+    private void SearchAndDestroy()
+    {
+        targets.RemoveAll(x => x == null);
+        if (targets.Count != 0) // if targets on the list
+        {
+            // shoot the bullet
+            Debug.Log("Shooting!");
+            var currentTarget = targets[0];
+            if (currentTarget)
+            {
+                var bullet = (GameObject)Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+                bullet.GetComponent<BulletsController>().target = currentTarget.transform;
+            }
+        }
+    }
+
+    public void AddEnemy(GameObject enemy)
+    {
+        if (enemy.GetComponent<EnemyController>())
+        {
+            Debug.Log("Enemy tracked");
+            targets.Add(enemy);
+        }
+    }
+
+    public void RemoveEnemy(GameObject enemy)
+    {
+        if (enemy.GetComponent<EnemyController>())
+        {
+            Debug.Log("Enemy dead");
+            targets.Remove(enemy);
+        }
+    } 
+    #endregion
 }

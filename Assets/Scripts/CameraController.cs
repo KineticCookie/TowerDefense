@@ -3,42 +3,73 @@ using System.Collections;
 
 public class CameraController : MonoBehaviour {
 
-    public float HorizontalSpeed = 40;
-    public float VerticalSpeed = 40;
-    public float CameraDistance = 30;
+    #region Fields
+    /// <summary>
+    /// Horizontal scrolling speed
+    /// </summary>
+    public float horizontalSpeed = 20;
 
-    public float Boundary = 1;
+    /// <summary>
+    /// Vertical scrolling speed
+    /// </summary>
+    public float verticalSpeed = 20;
 
-    private float ScreenWidth;
-    private float ScreenHeight;
+    /// <summary>
+    /// Camera height from terrain
+    /// </summary>
+    public float cameraDistance = 30; // TODO: mouse scroll to zoom
 
-    // Use this for initialization
-    void Start () {
-        ScreenHeight = Screen.height;
-        ScreenWidth = Screen.width;
-        transform.rotation = Quaternion.Euler(45, 0, 0);
+    /// <summary>
+    /// Offset from screen borders to trigger scrolling
+    /// </summary>
+    public float boundary = 1;
+
+    /// <summary>
+    /// Screen width
+    /// </summary>
+    private float screenWidth;
+
+    /// <summary>
+    /// Screen height
+    /// </summary>
+    private float screenHeight;
+    #endregion
+
+    #region Behaviour
+    /// <summary>
+    /// Camera initialization
+    /// </summary>
+    void Start()
+    {
+        screenHeight = Screen.height;
+        screenWidth = Screen.width;
+        transform.rotation = Quaternion.Euler(60, 0, 0);
     }
-	
-	// Update is called once per frame
-	void Update () {
-        if (Input.mousePosition.x > ScreenWidth - Boundary)
+
+    /// <summary>
+    /// RTS-like camera logic is implemented here.
+    /// </summary>
+    void Update() // TDOD: bind camera to terrain
+    {
+        if (Input.mousePosition.x > screenWidth - boundary)
         {
-            transform.position += new Vector3( Time.deltaTime * HorizontalSpeed, 0.0f, 0.0f);
+            transform.position += new Vector3(Time.deltaTime * horizontalSpeed, 0.0f, 0.0f);
         }
 
-        if (Input.mousePosition.x < 0 + Boundary)
+        if (Input.mousePosition.x < 0 + boundary)
         {
-            transform.position -= new Vector3( Time.deltaTime * HorizontalSpeed, 0.0f, 0.0f);
+            transform.position -= new Vector3(Time.deltaTime * horizontalSpeed, 0.0f, 0.0f);
         }
 
-        if (Input.mousePosition.y > ScreenHeight - Boundary)
+        if (Input.mousePosition.y > screenHeight - boundary)
         {
-            transform.position += new Vector3(0.0f, 0.0f, Time.deltaTime * VerticalSpeed);
+            transform.position += new Vector3(0.0f, 0.0f, Time.deltaTime * verticalSpeed);
         }
 
-        if (Input.mousePosition.y < 0 + Boundary)
+        if (Input.mousePosition.y < 0 + boundary)
         {
-            transform.position -= new Vector3(0.0f, 0.0f, Time.deltaTime * VerticalSpeed);
+            transform.position -= new Vector3(0.0f, 0.0f, Time.deltaTime * verticalSpeed);
         }
-    }
+    } 
+    #endregion
 }
