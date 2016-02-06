@@ -16,6 +16,11 @@ public class TowerController : MonoBehaviour
     public float shotsPause = 1;
 
     /// <summary>
+    /// Tower's price
+    /// </summary>
+    public float price;
+
+    /// <summary>
     /// Queue of spotted targets. Tower will fire to the first enemy in queue.
     /// </summary>
     private List<GameObject> targets = new List<GameObject>();
@@ -24,7 +29,29 @@ public class TowerController : MonoBehaviour
     #region Behaviour
     void Start()
     {
-        InvokeRepeating("SearchAndDestroy", shotsPause, shotsPause);
+        InvokeRepeating("SearchAndDestroy", 0, shotsPause);
+    }
+
+    void OnTriggerEnter(Collider co)
+    {
+        var enemyController = co.GetComponent<EnemyController>();
+        if(enemyController)
+        {
+            Debug.Log("I see the enemy");
+            enemyController.Death += RemoveEnemy;
+            targets.Add(co.gameObject);
+        }
+    }
+
+    void OnTriggerExit(Collider co)
+    {
+        var enemyController = co.GetComponent<EnemyController>();
+        if (enemyController)
+        {
+            Debug.Log("I lost the enemy");
+            enemyController.Death -= RemoveEnemy;
+            targets.Remove(co.gameObject);
+        }
     }
     #endregion
 
@@ -42,15 +69,6 @@ public class TowerController : MonoBehaviour
                 var bullet = (GameObject)Instantiate(bulletPrefab, transform.position, Quaternion.identity);
                 bullet.GetComponent<BulletsController>().target = currentTarget.transform;
             }
-        }
-    }
-
-    public void AddEnemy(GameObject enemy)
-    {
-        if (enemy.GetComponent<EnemyController>())
-        {
-            Debug.Log("Enemy tracked");
-            targets.Add(enemy);
         }
     }
 
