@@ -32,30 +32,41 @@ public class TowerController : MonoBehaviour
         InvokeRepeating("SearchAndDestroy", 0, shotsPause);
     }
 
+    /// <summary>
+    /// When collided, add enemy on the tracking list
+    /// </summary>
+    /// <param name="co"></param>
     void OnTriggerEnter(Collider co)
     {
         var enemyController = co.GetComponent<EnemyController>();
         if(enemyController)
         {
             Debug.Log("I see the enemy");
-            enemyController.Death += RemoveEnemy;
+            enemyController.Death += OnEnemyDeath;
             targets.Add(co.gameObject);
         }
     }
 
+    /// <summary>
+    /// When collider quit, remove enemy off the tracking list
+    /// </summary>
+    /// <param name="co"></param>
     void OnTriggerExit(Collider co)
     {
         var enemyController = co.GetComponent<EnemyController>();
         if (enemyController)
         {
             Debug.Log("I lost the enemy");
-            enemyController.Death -= RemoveEnemy;
+            enemyController.Death -= OnEnemyDeath;
             targets.Remove(co.gameObject);
         }
     }
     #endregion
 
     #region Methods
+    /// <summary>
+    /// If has enemies on the tracklist, attack first.
+    /// </summary>
     private void SearchAndDestroy()
     {
         targets.RemoveAll(x => x == null);
@@ -72,7 +83,11 @@ public class TowerController : MonoBehaviour
         }
     }
 
-    public void RemoveEnemy(GameObject enemy)
+    /// <summary>
+    /// Remove enemy from the tracklist when he is dead
+    /// </summary>
+    /// <param name="enemy"></param>
+    public void OnEnemyDeath(GameObject enemy)
     {
         if (enemy.GetComponent<EnemyController>())
         {

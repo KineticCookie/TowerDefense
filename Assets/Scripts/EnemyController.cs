@@ -20,7 +20,7 @@ public class EnemyController : Damageable
     #region Behaviour
     void Start()
     {
-        var castle = GameObject.Find("Castle");
+        var castle = GameObject.Find(Constants.GameObjects.Castle);
         if (castle)
             GetComponent<NavMeshAgent>().destination = castle.transform.position;
         Death += GetReward;
@@ -37,8 +37,8 @@ public class EnemyController : Damageable
         var castle = co.GetComponent<CastleController>();
         if (castle)
         {
-            castle.TakeDamage(damage);
-            Destroy(gameObject);
+            castle.TakeDamage(damage); // Deal damage to the castle
+            KillSelf(); // Kill yourself
         }
     }
     #endregion

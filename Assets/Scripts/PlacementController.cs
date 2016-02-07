@@ -29,7 +29,7 @@ public class PlacementController : MonoBehaviour {
         {
             var gameController = Camera.main.GetComponent<GameController>();
             var towerController = towerPrefab.GetComponent<TowerController>();
-            if (gameController.money >= towerController.price)
+            if (gameController.moneyCurrent >= towerController.price)
             {
                 var gObject = Instantiate(towerPrefab);
                 gObject.transform.position = transform.position + Vector3.up;

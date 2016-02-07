@@ -48,9 +48,8 @@ public class CameraController : MonoBehaviour {
     /// <summary>
     /// RTS-like camera logic is implemented here.
     /// </summary>
-    void Update() // TDOD: bind camera to terrain
+    void Update()
     {
-
         if (Input.mousePosition.x > screenWidth - boundary)
         {
             transform.position += new Vector3(Time.deltaTime * horizontalSpeed, 0.0f, 0.0f);
@@ -69,11 +68,11 @@ public class CameraController : MonoBehaviour {
             transform.position -= new Vector3(0.0f, 0.0f, Time.deltaTime * verticalSpeed);
         }
 
-        if(Input.GetAxis("Mouse ScrollWheel") > 0) // zoom out
+        if(Input.GetAxis(Constants.Axes.MouseScrollWheel) > 0) // zoom out
         {
             Camera.main.fieldOfView = Mathf.Max(Camera.main.fieldOfView - deltaFOV, minFOV);
         }
-        else if (Input.GetAxis("Mouse ScrollWheel") < 0) // zoom in
+        else if (Input.GetAxis(Constants.Axes.MouseScrollWheel) < 0) // zoom in
         {
             Camera.main.fieldOfView = Mathf.Min(Camera.main.fieldOfView + deltaFOV, maxFOV);
         }

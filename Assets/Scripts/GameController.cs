@@ -1,52 +1,50 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 
 public class GameController : MonoBehaviour
 {
-    //TODO: shit ton of logic and fields. Refactor
     #region Fields
     /// <summary>
-    /// Amount of money, player has got
+    /// Start amount of money, player has got
     /// </summary>
-    public float money;
+    public float moneyStart;
+
+    /// <summary>
+    /// Current amoun of money
+    /// </summary>
+    public float moneyCurrent { get; private set; }
 
     /// <summary>
     /// List of enemy quantity per wave.
     /// </summary>
     public List<uint> wavesConfig;
 
+    /// <summary>
+    /// Interval between spawning enemies
+    /// </summary>
     public float spawnInterval = 3;
 
-    private int currentWave = 0;
+    /// <summary>
+    /// Current wave
+    /// </summary>
+    public int waveCurrent { get; private set; }
 
     /// <summary>
-    /// UI Text object for money output
+    /// Amount of waves
     /// </summary>
-    private GameObject uiMoneyText;
+    public int waveCount { get; private set; }
 
     /// <summary>
-    /// UI Text object for health output
+    /// Spawner's controller for actually spawning
     /// </summary>
-    private GameObject uiHealthText;
-
-    /// <summary>
-    /// UI Text object for waves output
-    /// </summary>
-    private GameObject uiWaveText;
-
-    private GameObject spawner;
     private SpawnerController spawnerController;
 
     /// <summary>
     /// List of spawned enemies on current wave.
     /// </summary>
-    private List<GameObject> enemies = new List<GameObject>();
-
-    private GameObject castle;
-    private CastleController castleController;
+    private List<GameObject> enemies = new List<GameObject>(); // TODO: more customisation
     #endregion
 
     #region Behaviour
@@ -55,38 +53,36 @@ public class GameController : MonoBehaviour
     /// </summary>
     void Start()
     {
+        waveCurrent = 0;
         if (wavesConfig.Count == 0)
             wavesConfig = new List<uint>
             {
                 1,2,3,4,5
             };
+        waveCount = wavesConfig.Count;
 
-        castle = GameObject.Find("Castle");
-        castleController = castle.GetComponent<CastleController>();
-        castleController.Death += GameOver;
+        moneyCurrent = moneyStart;
 
-        spawner = GameObject.Find("Spawner");
+        var castle = GameObject.Find(Constants.GameObjects.Castle);
+        var castleController = castle.GetComponent<CastleController>();
+        castleController.Death += GameOver; // Subscribe on castle death.
+
+        var spawner = GameObject.Find(Constants.GameObjects.Spawner);
         spawnerController = spawner.GetComponent<SpawnerController>();
-
-        uiMoneyText = GameObject.Find("MoneyText");
-        uiHealthText = GameObject.Find("HealthText");
-        uiWaveText = GameObject.Find("WaveText");
     }
 
     void Update()
     {
-        UpdateUI();
-
         if (enemies.Count == 0) // If wave is ended
         {
-            if (currentWave < wavesConfig.Count) // And there is more waves
+            if (waveCurrent < waveCount) // And there is more waves
             {
-                StartCoroutine(SpawnWave(wavesConfig[currentWave])); // spawn more enemies
-                currentWave++;
+                StartCoroutine(SpawnWave(wavesConfig[waveCurrent])); // spawn more enemies
+                waveCurrent++;
             }
             else // And there is no more waves left
             {
-                SceneManager.LoadScene("Winner"); // WIN
+                SceneManager.LoadScene(Constants.Scenes.Win); // WIN
                 Debug.Log("You survived");
             }
         }
@@ -115,31 +111,21 @@ public class GameController : MonoBehaviour
     }
 
     /// <summary>
-    /// Update UI information
-    /// </summary>
-    private void UpdateUI()
-    {
-        uiHealthText.GetComponent<Text>().text = string.Format(Constants.HealthText_1, castleController.hp);
-        uiMoneyText.GetComponent<Text>().text = string.Format(Constants.MoneyText_1, money);
-        uiWaveText.GetComponent<Text>().text = string.Format(Constants.WaveText_2, currentWave, wavesConfig.Count);
-    }
-
-    /// <summary>
     /// Adds money to bank
     /// </summary>
     /// <param name="quantity">how much</param>
-    public void AddMoney(float quantity) //TODO: srsly?
+    public void AddMoney(float quantity)
     {
-        money += quantity;
+        moneyCurrent += quantity;
     }
 
     /// <summary>
     /// Removes money from bank
     /// </summary>
     /// <param name="quantity">how much</param>
-    public void RemoveMoney(float quantity) //TODO: srsly?
+    public void RemoveMoney(float quantity)
     {
-        money -= quantity;
+        moneyCurrent -= quantity;
     }
 
     /// <summary>
@@ -148,7 +134,7 @@ public class GameController : MonoBehaviour
     /// <param name="obj"></param>
     private void GameOver(GameObject obj)
     {
-        SceneManager.LoadScene("GameOver");
+        SceneManager.LoadScene(Constants.Scenes.GameOver);
         Debug.Log("Castle has been destroyed");
     } 
     #endregion
