@@ -16,6 +16,11 @@ public class TowerController : MonoBehaviour
     public float shotsPause = 1;
 
     /// <summary>
+    /// Tower's price
+    /// </summary>
+    public float price;
+
+    /// <summary>
     /// Queue of spotted targets. Tower will fire to the first enemy in queue.
     /// </summary>
     private List<GameObject> targets = new List<GameObject>();
@@ -24,11 +29,44 @@ public class TowerController : MonoBehaviour
     #region Behaviour
     void Start()
     {
-        InvokeRepeating("SearchAndDestroy", shotsPause, shotsPause);
+        InvokeRepeating("SearchAndDestroy", 0, shotsPause);
+    }
+
+    /// <summary>
+    /// When collided, add enemy on the tracking list
+    /// </summary>
+    /// <param name="co"></param>
+    void OnTriggerEnter(Collider co)
+    {
+        var enemyController = co.GetComponent<EnemyController>();
+        if(enemyController)
+        {
+            Debug.Log("I see the enemy");
+            enemyController.Death += OnEnemyDeath;
+            targets.Add(co.gameObject);
+        }
+    }
+
+    /// <summary>
+    /// When collider quit, remove enemy off the tracking list
+    /// </summary>
+    /// <param name="co"></param>
+    void OnTriggerExit(Collider co)
+    {
+        var enemyController = co.GetComponent<EnemyController>();
+        if (enemyController)
+        {
+            Debug.Log("I lost the enemy");
+            enemyController.Death -= OnEnemyDeath;
+            targets.Remove(co.gameObject);
+        }
     }
     #endregion
 
     #region Methods
+    /// <summary>
+    /// If has enemies on the tracklist, attack first.
+    /// </summary>
     private void SearchAndDestroy()
     {
         targets.RemoveAll(x => x == null);
@@ -45,16 +83,11 @@ public class TowerController : MonoBehaviour
         }
     }
 
-    public void AddEnemy(GameObject enemy)
-    {
-        if (enemy.GetComponent<EnemyController>())
-        {
-            Debug.Log("Enemy tracked");
-            targets.Add(enemy);
-        }
-    }
-
-    public void RemoveEnemy(GameObject enemy)
+    /// <summary>
+    /// Remove enemy from the tracklist when he is dead
+    /// </summary>
+    /// <param name="enemy"></param>
+    public void OnEnemyDeath(GameObject enemy)
     {
         if (enemy.GetComponent<EnemyController>())
         {

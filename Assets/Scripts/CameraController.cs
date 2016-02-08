@@ -15,11 +15,6 @@ public class CameraController : MonoBehaviour {
     public float verticalSpeed = 20;
 
     /// <summary>
-    /// Camera height from terrain
-    /// </summary>
-    public float cameraDistance = 30; // TODO: mouse scroll to zoom
-
-    /// <summary>
     /// Offset from screen borders to trigger scrolling
     /// </summary>
     public float boundary = 1;
@@ -33,6 +28,10 @@ public class CameraController : MonoBehaviour {
     /// Screen height
     /// </summary>
     private float screenHeight;
+
+    private float minFOV = 20;
+    private float maxFOV = 60;
+    private float deltaFOV = 5;
     #endregion
 
     #region Behaviour
@@ -49,14 +48,13 @@ public class CameraController : MonoBehaviour {
     /// <summary>
     /// RTS-like camera logic is implemented here.
     /// </summary>
-    void Update() // TDOD: bind camera to terrain
+    void Update()
     {
         if (Input.mousePosition.x > screenWidth - boundary)
         {
             transform.position += new Vector3(Time.deltaTime * horizontalSpeed, 0.0f, 0.0f);
         }
-
-        if (Input.mousePosition.x < 0 + boundary)
+        else if (Input.mousePosition.x < 0 + boundary)
         {
             transform.position -= new Vector3(Time.deltaTime * horizontalSpeed, 0.0f, 0.0f);
         }
@@ -65,10 +63,18 @@ public class CameraController : MonoBehaviour {
         {
             transform.position += new Vector3(0.0f, 0.0f, Time.deltaTime * verticalSpeed);
         }
-
-        if (Input.mousePosition.y < 0 + boundary)
+        else if (Input.mousePosition.y < 0 + boundary)
         {
             transform.position -= new Vector3(0.0f, 0.0f, Time.deltaTime * verticalSpeed);
+        }
+
+        if(Input.GetAxis(Constants.Axes.MouseScrollWheel) > 0) // zoom out
+        {
+            Camera.main.fieldOfView = Mathf.Max(Camera.main.fieldOfView - deltaFOV, minFOV);
+        }
+        else if (Input.GetAxis(Constants.Axes.MouseScrollWheel) < 0) // zoom in
+        {
+            Camera.main.fieldOfView = Mathf.Min(Camera.main.fieldOfView + deltaFOV, maxFOV);
         }
     } 
     #endregion

@@ -22,14 +22,20 @@ public class PlacementController : MonoBehaviour {
         isFree = true;
     }
 
-    // TODO: make a list of placeable towersPrefabs. menu maybe
+    // TODO: make a list of placeable towersPrefabs maybe
     void OnMouseUpAsButton()
     {
         if (isFree)
         {
-            var gObject = Instantiate(towerPrefab);
-            gObject.transform.position = transform.position + Vector3.up;
-            isFree = false;
+            var gameController = Camera.main.GetComponent<GameController>();
+            var towerController = towerPrefab.GetComponent<TowerController>();
+            if (gameController.moneyCurrent >= towerController.price)
+            {
+                var gObject = Instantiate(towerPrefab);
+                gObject.transform.position = transform.position + Vector3.up;
+                isFree = false;
+                gameController.RemoveMoney(towerController.price);
+            }
         }
     } 
     #endregion

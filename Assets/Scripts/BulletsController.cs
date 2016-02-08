@@ -28,9 +28,12 @@ public class BulletsController : MonoBehaviour
     {
         // If bullet has a target
         if (target)
-        { // Fly towards it
+        { 
+            // Fly towards it
             var dir = target.position - transform.position;
             GetComponent<Rigidbody>().velocity = dir.normalized * speed;
+            // Rotate towards it
+            transform.LookAt(target.transform);
         }
         else
         { // Destroy self
